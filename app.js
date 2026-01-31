@@ -156,43 +156,253 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 					top: offsetPosition,
 					behavior: 'smooth'
 				});
+				
+				// Close mobile menu if open
+				if (mobile_menu && mobile_menu.classList.contains('active')) {
+					hamburger.classList.remove('active');
+					mobile_menu.classList.remove('active');
+				}
 			}
 		}
 	});
 });
 
-// Add animation on scroll
+// Chat button animation on load
+window.addEventListener('load', () => {
+	const chatButton = document.getElementById('chatButton');
+	if (chatButton) {
+		setTimeout(() => {
+			chatButton.style.opacity = '1';
+		}, 1000);
+	}
+});
+
+// ============================================
+// MODERN SCROLL ANIMATIONS & GEN-Z EFFECTS
+// ============================================
+
+// Enhanced Intersection Observer for Scroll Animations
 const observerOptions = {
 	threshold: 0.1,
-	rootMargin: '0px 0px -50px 0px'
+	rootMargin: '0px 0px -100px 0px'
 };
 
-const observer = new IntersectionObserver(function(entries) {
+const scrollObserver = new IntersectionObserver(function(entries) {
 	entries.forEach(entry => {
 		if (entry.isIntersecting) {
-			entry.target.style.opacity = '1';
-			entry.target.style.transform = 'translateY(0)';
+			entry.target.classList.add('visible');
+			// Remove observer after animation to improve performance
+			scrollObserver.unobserve(entry.target);
 		}
 	});
 }, observerOptions);
 
-// Observe elements for animation
-document.querySelectorAll('.overview-item, .service-card, .why-item, .case-study-card, .tech-category, .contact-info-card').forEach(el => {
-	el.style.opacity = '0';
-	el.style.transform = 'translateY(30px)';
-	el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-	observer.observe(el);
+// Add fade-up animation to sections and cards
+document.querySelectorAll('section:not(#hero):not(#header)').forEach(section => {
+	section.classList.add('fade-up');
+	scrollObserver.observe(section);
 });
 
-// Add stagger animation delay
-document.querySelectorAll('.overview-item').forEach((el, index) => {
-	el.style.transitionDelay = `${index * 0.1}s`;
+// Animate cards and items with stagger
+document.querySelectorAll('.overview-item, .service-card, .why-item, .case-study-card, .tech-category, .contact-info-card, .mission, .vision').forEach((el, index) => {
+	el.classList.add('fade-up');
+	el.style.transitionDelay = `${(index % 6) * 0.1}s`;
+	scrollObserver.observe(el);
 });
 
-document.querySelectorAll('.service-card').forEach((el, index) => {
-	el.style.transitionDelay = `${index * 0.1}s`;
+// Animate section titles
+document.querySelectorAll('.section-title').forEach((el, index) => {
+	el.classList.add('fade-in');
+	el.style.transitionDelay = `${index * 0.2}s`;
+	scrollObserver.observe(el);
 });
 
-document.querySelectorAll('.why-item').forEach((el, index) => {
-	el.style.transitionDelay = `${index * 0.1}s`;
+// Count-Up Animation for Numbers
+function animateCounter(element, target, duration = 2000) {
+	let start = 0;
+	const increment = target / (duration / 16);
+	const timer = setInterval(() => {
+		start += increment;
+		if (start >= target) {
+			element.textContent = target + (element.textContent.includes('+') ? '+' : '') + (element.textContent.includes('%') ? '%' : '');
+			clearInterval(timer);
+		} else {
+			element.textContent = Math.floor(start) + (element.textContent.includes('+') ? '+' : '') + (element.textContent.includes('%') ? '%' : '');
+		}
+	}, 16);
+}
+
+// Observe stats for count-up animation
+const statsObserver = new IntersectionObserver(function(entries) {
+	entries.forEach(entry => {
+		if (entry.isIntersecting) {
+			const text = entry.target.textContent;
+			const number = parseInt(text.replace(/\D/g, ''));
+			if (number && !entry.target.classList.contains('counted')) {
+				entry.target.classList.add('counted', 'counter-animate');
+				entry.target.textContent = '0' + (text.includes('+') ? '+' : '') + (text.includes('%') ? '%' : '');
+				animateCounter(entry.target, number);
+				statsObserver.unobserve(entry.target);
+			}
+		}
+	});
+}, { threshold: 0.5 });
+
+// Find and observe stat numbers
+document.querySelectorAll('.stat-item h3, .clients-stat h2 strong').forEach(stat => {
+	statsObserver.observe(stat);
+});
+
+// Ripple Effect for Buttons
+document.querySelectorAll('.cta, button').forEach(button => {
+	button.addEventListener('click', function(e) {
+		if (this.classList.contains('ripple')) {
+			const ripple = document.createElement('span');
+			ripple.style.cssText = `
+				position: absolute;
+				border-radius: 50%;
+				background: rgba(255, 255, 255, 0.6);
+				width: 20px;
+				height: 20px;
+				margin-top: -10px;
+				margin-left: -10px;
+				top: ${e.offsetY}px;
+				left: ${e.offsetX}px;
+				transform: scale(0);
+				animation: ripple 0.6s;
+				pointer-events: none;
+			`;
+			this.appendChild(ripple);
+			setTimeout(() => ripple.remove(), 600);
+		}
+	});
+});
+
+// Parallax Effect on Scroll
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+	const scrolled = window.pageYOffset;
+	const parallaxElements = document.querySelectorAll('.parallax');
+	
+	parallaxElements.forEach(el => {
+		const speed = el.dataset.speed || 0.5;
+		const yPos = -(scrolled * speed);
+		el.style.transform = `translateY(${yPos}px)`;
+	});
+	
+	lastScroll = scrolled;
+}, { passive: true });
+
+// Word-by-Word Text Reveal for Hero
+function revealTextByWords(element) {
+	const text = element.textContent;
+	const words = text.split(' ');
+	element.textContent = '';
+	
+	words.forEach((word, index) => {
+		const span = document.createElement('span');
+		span.textContent = word + ' ';
+		span.style.opacity = '0';
+		span.style.transform = 'translateY(20px)';
+		span.style.transition = `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.1}s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.1}s`;
+		element.appendChild(span);
+		
+		setTimeout(() => {
+			span.style.opacity = '1';
+			span.style.transform = 'translateY(0)';
+		}, 100);
+	});
+}
+
+// Apply word reveal to hero tagline after initial animation
+setTimeout(() => {
+	const heroTagline = document.querySelector('.hero-tagline');
+	if (heroTagline) {
+		revealTextByWords(heroTagline);
+	}
+}, 2500);
+
+// Smooth Cursor Follow Effect (Subtle)
+let mouseX = 0, mouseY = 0;
+let cursorX = 0, cursorY = 0;
+
+document.addEventListener('mousemove', (e) => {
+	mouseX = e.clientX;
+	mouseY = e.clientY;
+}, { passive: true });
+
+// Animate cursor follow
+function animateCursor() {
+	cursorX += (mouseX - cursorX) * 0.1;
+	cursorY += (mouseY - cursorY) * 0.1;
+	requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// Add animated mesh background to hero
+const hero = document.querySelector('#hero');
+if (hero) {
+	const mesh = document.createElement('div');
+	mesh.classList.add('animated-mesh');
+	hero.appendChild(mesh);
+}
+
+// Enhanced Button Hover Glow
+document.querySelectorAll('.cta-primary').forEach(btn => {
+	btn.addEventListener('mouseenter', function() {
+		this.style.boxShadow = '0 0 30px rgba(220, 20, 60, 0.6), 0 8px 25px rgba(220, 20, 60, 0.4)';
+	});
+	btn.addEventListener('mouseleave', function() {
+		this.style.boxShadow = '';
+	});
+});
+
+// Form Input Focus Enhancement
+document.querySelectorAll('.form-group input, .form-group textarea, .form-group select').forEach(input => {
+	input.addEventListener('focus', function() {
+		this.parentElement.style.transform = 'scale(1.01)';
+		this.parentElement.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+	});
+	input.addEventListener('blur', function() {
+		this.parentElement.style.transform = 'scale(1)';
+	});
+});
+
+// Scroll Progress Indicator
+const scrollProgress = document.createElement('div');
+scrollProgress.style.cssText = `
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 0%;
+	height: 3px;
+	background: linear-gradient(90deg, #dc143c, #ff3366);
+	z-index: 9999;
+	transition: width 0.1s ease;
+`;
+document.body.appendChild(scrollProgress);
+
+// Hide scroll indicator when scrolling past hero
+const scrollIndicator = document.querySelector('.scroll-indicator');
+window.addEventListener('scroll', () => {
+	const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+	const scrolled = (window.scrollY / windowHeight) * 100;
+	scrollProgress.style.width = scrolled + '%';
+	
+	// Hide scroll indicator after hero section
+	if (scrollIndicator && window.scrollY > 300) {
+		scrollIndicator.style.opacity = '0';
+		scrollIndicator.style.transition = 'opacity 0.3s ease';
+	} else if (scrollIndicator) {
+		scrollIndicator.style.opacity = '0.7';
+	}
+}, { passive: true });
+
+// Add smooth entrance animation to page load
+window.addEventListener('load', () => {
+	document.body.style.opacity = '0';
+	document.body.style.transition = 'opacity 0.5s ease';
+	setTimeout(() => {
+		document.body.style.opacity = '1';
+	}, 100);
 });
