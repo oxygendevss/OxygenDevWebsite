@@ -143,7 +143,7 @@ p {
 
 #header .nav-list ul {
 	list-style: none;
-	position: absolute;
+	position: fixed;
 	background-color: #ffffff;
 	width: 100vw;
 	height: 100vh;
@@ -153,24 +153,57 @@ p {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	z-index: 1;
+	z-index: 9999;
 	overflow-x: hidden;
-	transition: 0.5s ease left;
+	overflow-y: auto;
+	transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	padding: 0;
+	margin: 0;
+	box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+	pointer-events: none;
 }
 #header .nav-list ul.active {
 	left: 0%;
+	pointer-events: auto;
+}
+/* Navigation menu is now always visible - no hamburger needed */
+#header .nav-list ul li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	text-align: center;
+	display: block;
 }
 #header .nav-list ul a {
 	font-size: 1.8rem;
 	font-weight: 500;
 	letter-spacing: 0.05rem;
 	text-decoration: none;
-	color: #333;
+	color: #333 !important;
 	text-transform: none;
-	padding: 20px;
+	padding: 20px 30px;
 	display: block;
-	transition: color 0.3s ease;
+	transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	position: relative;
+	width: 100%;
+	opacity: 0;
+	transform: translateX(30px);
+	visibility: hidden;
 }
+#header .nav-list ul.active a {
+	opacity: 1 !important;
+	transform: translateX(0) !important;
+	visibility: visible !important;
+	transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#header .nav-list ul.active li:nth-child(1) a { transition-delay: 0.1s; }
+#header .nav-list ul.active li:nth-child(2) a { transition-delay: 0.2s; }
+#header .nav-list ul.active li:nth-child(3) a { transition-delay: 0.3s; }
+#header .nav-list ul.active li:nth-child(4) a { transition-delay: 0.4s; }
+#header .nav-list ul.active li:nth-child(5) a { transition-delay: 0.5s; }
+#header .nav-list ul.active li:nth-child(6) a { transition-delay: 0.6s; }
+#header .nav-list ul.active li:nth-child(7) a { transition-delay: 0.7s; }
 #header .nav-list ul a::after {
 	content: attr(data-after);
 	position: absolute;
@@ -191,60 +224,7 @@ p {
 #header .nav-list ul li:hover a {
 	color: #dc143c;
 }
-#header .hamburger {
-	height: 50px;
-	width: 50px;
-	display: inline-block;
-	border: 3px solid white;
-	border-radius: 50%;
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 100;
-	cursor: pointer;
-	transform: scale(0.8);
-	margin-right: 20px;
-}
-#header .hamburger:after {
-	position: absolute;
-	content: '';
-	height: 100%;
-	width: 100%;
-	border-radius: 50%;
-	border: 3px solid white;
-	animation: hamburger_puls 1s ease infinite;
-}
-#header .hamburger .bar {
-	height: 2px;
-	width: 25px;
-	position: relative;
-	background-color: white;
-	z-index: -1;
-}
-#header .hamburger .bar::after,
-#header .hamburger .bar::before {
-	content: '';
-	position: absolute;
-	height: 100%;
-	width: 100%;
-	left: 0;
-	background-color: white;
-	transition: 0.3s ease;
-	transition-property: top, bottom;
-}
-#header .hamburger .bar::after {
-	top: 6px;
-}
-#header .hamburger .bar::before {
-	bottom: 6px;
-}
-#header .hamburger.active .bar::before {
-	bottom: 0;
-}
-#header .hamburger.active .bar::after {
-	top: 0;
-}
+/* Hamburger menu removed - navigation is now always visible */
 /* End Header section */
 
 /* Hero Section */
@@ -1270,6 +1250,15 @@ p {
 	.nav-bar {
 		padding: 0 15px;
 	}
+	#header .nav-list ul {
+		flex-wrap: wrap;
+		gap: 15px;
+		justify-content: center;
+	}
+	#header .nav-list ul a {
+		font-size: 1.3rem;
+		padding: 8px 12px;
+	}
 }
 
 @media screen and (max-width: 480px) {
@@ -1397,6 +1386,7 @@ p {
 .tech-category {
 	transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	will-change: transform;
+	position: relative;
 }
 .service-card:hover,
 .case-study-card:hover,
@@ -1404,6 +1394,12 @@ p {
 .why-item:hover,
 .tech-category:hover {
 	transform: translateY(-12px) scale(1.02);
+	z-index: 10;
+}
+/* Add glow effect on hover */
+.service-card:hover,
+.case-study-card:hover {
+	box-shadow: 0 20px 50px rgba(220, 20, 60, 0.2), 0 15px 40px rgba(0, 0, 0, 0.1);
 }
 .service-icon,
 .overview-icon,
@@ -1671,6 +1667,296 @@ section {
 .counter-animate {
 	animation: countUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ============================================
+   ADDITIONAL ANIMATIONS & EFFECTS
+   ============================================ */
+
+/* Shake animation for attention */
+@keyframes shake {
+	0%, 100% { transform: translateX(0); }
+	10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+	20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+.shake:hover {
+	animation: shake 0.5s;
+}
+
+/* Rotate animation */
+@keyframes rotate {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+.rotate-slow {
+	animation: rotate 20s linear infinite;
+}
+
+/* Bounce animation */
+@keyframes bounce {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-10px); }
+}
+.bounce {
+	animation: bounce 2s ease-in-out infinite;
+}
+
+/* Glow pulse */
+@keyframes glowPulse {
+	0%, 100% {
+		box-shadow: 0 0 20px rgba(220, 20, 60, 0.4);
+	}
+	50% {
+		box-shadow: 0 0 40px rgba(220, 20, 60, 0.8), 0 0 60px rgba(220, 20, 60, 0.4);
+	}
+}
+.glow-pulse {
+	animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Slide in from sides */
+@keyframes slideInLeft {
+	from {
+		opacity: 0;
+		transform: translateX(-100px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+@keyframes slideInRight {
+	from {
+		opacity: 0;
+		transform: translateX(100px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+/* Scale in animation */
+@keyframes scaleIn {
+	from {
+		opacity: 0;
+		transform: scale(0.8);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+.scale-in {
+	animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Rotate on hover */
+.rotate-on-hover {
+	transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rotate-on-hover:hover {
+	transform: rotate(5deg) scale(1.05);
+}
+
+/* Gradient text animation */
+@keyframes gradientText {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+.gradient-text {
+	background: linear-gradient(90deg, #dc143c, #ff3366, #dc143c);
+	background-size: 200% auto;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	animation: gradientText 3s linear infinite;
+}
+
+/* Magnetic hover effect */
+.magnetic {
+	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.magnetic:hover {
+	transform: translateY(-5px);
+}
+
+/* Animated border */
+@keyframes borderGlow {
+	0%, 100% {
+		border-color: rgba(220, 20, 60, 0.5);
+		box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+	}
+	50% {
+		border-color: rgba(220, 20, 60, 1);
+		box-shadow: 0 0 20px rgba(220, 20, 60, 0.6);
+	}
+}
+.animated-border {
+	animation: borderGlow 2s ease-in-out infinite;
+}
+
+/* Flip card effect */
+.flip-card {
+	perspective: 1000px;
+}
+.flip-card-inner {
+	transition: transform 0.6s;
+	transform-style: preserve-3d;
+}
+.flip-card:hover .flip-card-inner {
+	transform: rotateY(5deg);
+}
+
+/* Loading dots animation */
+@keyframes loadingDots {
+	0%, 20% { content: '.'; }
+	40% { content: '..'; }
+	60%, 100% { content: '...'; }
+}
+.loading::after {
+	content: '...';
+	animation: loadingDots 1.5s steps(4, end) infinite;
+}
+
+/* Fade in scale */
+@keyframes fadeInScale {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+.fade-in-scale {
+	animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Slide up with fade */
+@keyframes slideUpFade {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+.slide-up-fade {
+	animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Enhanced service card animations */
+.service-card {
+	position: relative;
+	overflow: hidden;
+}
+.service-card::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(220, 20, 60, 0.1), transparent);
+	transition: left 0.5s;
+}
+.service-card:hover::after {
+	left: 100%;
+}
+
+/* Animated background pattern */
+@keyframes movePattern {
+	0% { background-position: 0 0; }
+	100% { background-position: 100px 100px; }
+}
+.animated-pattern {
+	background-image: 
+		linear-gradient(45deg, rgba(220, 20, 60, 0.05) 25%, transparent 25%),
+		linear-gradient(-45deg, rgba(220, 20, 60, 0.05) 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, rgba(220, 20, 60, 0.05) 75%),
+		linear-gradient(-45deg, transparent 75%, rgba(220, 20, 60, 0.05) 75%);
+	background-size: 20px 20px;
+	background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+	animation: movePattern 20s linear infinite;
+}
+
+/* Typing effect */
+@keyframes typing {
+	from { width: 0; }
+	to { width: 100%; }
+}
+@keyframes blink {
+	from, to { border-color: transparent; }
+	50% { border-color: #dc143c; }
+}
+.typing-effect {
+	overflow: hidden;
+	border-right: 3px solid #dc143c;
+	white-space: nowrap;
+	animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+}
+
+/* Particle effect background */
+.particles {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	z-index: -1;
+}
+.particle {
+	position: absolute;
+	background: rgba(220, 20, 60, 0.3);
+	border-radius: 50%;
+	animation: float 6s ease-in-out infinite;
+}
+
+/* Enhanced button press effect */
+.cta:active {
+	transform: scale(0.95) translateY(2px);
+	box-shadow: 0 2px 10px rgba(220, 20, 60, 0.3);
+}
+
+/* Image zoom on hover */
+.image-zoom {
+	overflow: hidden;
+}
+.image-zoom img {
+	transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.image-zoom:hover img {
+	transform: scale(1.1);
+}
+
+/* Text gradient animation on hover */
+.text-gradient-hover {
+	background: linear-gradient(90deg, #333, #dc143c, #333);
+	background-size: 200% auto;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	transition: background-position 0.5s ease;
+}
+.text-gradient-hover:hover {
+	background-position: 100% center;
+}
+
+/* Stagger children animation */
+.stagger-children > * {
+	opacity: 0;
+	transform: translateY(20px);
+	animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
 
 /* ============================================
    CHAT BUTTON - FLOATING ACTION BUTTON

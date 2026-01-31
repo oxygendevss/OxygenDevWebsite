@@ -1,12 +1,5 @@
-const hamburger = document.querySelector('.header .nav-bar .nav-list .hamburger');
-const mobile_menu = document.querySelector('.header .nav-bar .nav-list ul');
-const menu_item = document.querySelectorAll('.header .nav-bar .nav-list ul li a');
 const header = document.querySelector('.header.container');
-
-hamburger.addEventListener('click', () => {
-	hamburger.classList.toggle('active');
-	mobile_menu.classList.toggle('active');
-});
+const menu_item = document.querySelectorAll('.header .nav-bar .nav-list ul li a');
 
 document.addEventListener('scroll', () => {
 	var scroll_position = window.scrollY;
@@ -15,13 +8,6 @@ document.addEventListener('scroll', () => {
 	} else {
 		header.style.backgroundColor = 'rgba(26, 26, 26, 0.95)';
 	}
-});
-
-menu_item.forEach((item) => {
-	item.addEventListener('click', () => {
-		hamburger.classList.toggle('active');
-		mobile_menu.classList.toggle('active');
-	});
 });
 
 // Contact Form Handler with Formspree
@@ -406,3 +392,155 @@ window.addEventListener('load', () => {
 		document.body.style.opacity = '1';
 	}, 100);
 });
+
+// ============================================
+// ADDITIONAL ANIMATIONS & INTERACTIONS
+// ============================================
+
+// Add magnetic hover effect to cards
+document.querySelectorAll('.service-card, .case-study-card, .overview-item').forEach(card => {
+	card.addEventListener('mousemove', function(e) {
+		const rect = this.getBoundingClientRect();
+		const x = e.clientX - rect.left;
+		const y = e.clientY - rect.top;
+		
+		const centerX = rect.width / 2;
+		const centerY = rect.height / 2;
+		
+		const moveX = (x - centerX) / 10;
+		const moveY = (y - centerY) / 10;
+		
+		this.style.transform = `translateY(-12px) scale(1.02) translate(${moveX}px, ${moveY}px)`;
+	});
+	
+	card.addEventListener('mouseleave', function() {
+		this.style.transform = '';
+	});
+});
+
+// Add scale-in animation to images on load
+document.querySelectorAll('img').forEach(img => {
+	img.style.opacity = '0';
+	img.style.transform = 'scale(0.95)';
+	img.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+	
+	const imgObserver = new IntersectionObserver((entries) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				entry.target.style.opacity = '1';
+				entry.target.style.transform = 'scale(1)';
+				imgObserver.unobserve(entry.target);
+			}
+		});
+	}, { threshold: 0.1 });
+	
+	imgObserver.observe(img);
+});
+
+// Add animated gradient to section titles
+document.querySelectorAll('.section-title').forEach(title => {
+	title.addEventListener('mouseenter', function() {
+		this.style.background = 'linear-gradient(90deg, #1a1a1a, #dc143c, #1a1a1a)';
+		this.style.backgroundSize = '200% auto';
+		this.style.webkitBackgroundClip = 'text';
+		this.style.webkitTextFillColor = 'transparent';
+		this.style.backgroundClip = 'text';
+		this.style.animation = 'gradientText 3s linear infinite';
+	});
+});
+
+// Add stagger animation to service grid
+const servicesGrid = document.querySelector('.services-grid');
+if (servicesGrid) {
+	servicesGrid.classList.add('stagger-children');
+}
+
+// Add rotate on hover to icons
+document.querySelectorAll('.service-icon, .overview-icon, .why-icon').forEach(icon => {
+	icon.addEventListener('mouseenter', function() {
+		this.style.transform = 'rotate(360deg) scale(1.2)';
+		this.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+	});
+	icon.addEventListener('mouseleave', function() {
+		this.style.transform = '';
+	});
+});
+
+// Add pulse animation to CTA buttons periodically
+setInterval(() => {
+	document.querySelectorAll('.cta-primary').forEach(btn => {
+		btn.style.animation = 'glowPulse 2s ease-in-out';
+		setTimeout(() => {
+			btn.style.animation = '';
+		}, 2000);
+	});
+}, 10000);
+
+// Add scroll-triggered animations for tech items
+const techItems = document.querySelectorAll('.tech-item');
+techItems.forEach((item, index) => {
+	item.style.opacity = '0';
+	item.style.transform = 'scale(0.8) rotate(-10deg)';
+	
+	const techObserver = new IntersectionObserver((entries) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				setTimeout(() => {
+					entry.target.style.opacity = '1';
+					entry.target.style.transform = 'scale(1) rotate(0deg)';
+					entry.target.style.transition = `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.05}s`;
+				}, index * 50);
+				techObserver.unobserve(entry.target);
+			}
+		});
+	}, { threshold: 0.2 });
+	
+	techObserver.observe(item);
+});
+
+// Add animated border to active navigation items
+const updateActiveNav = () => {
+	const sections = document.querySelectorAll('section[id]');
+	const navLinks = document.querySelectorAll('#header .nav-list ul a');
+	
+	const scrollPos = window.scrollY + 100;
+	
+	sections.forEach(section => {
+		const top = section.offsetTop;
+		const height = section.offsetHeight;
+		const id = section.getAttribute('id');
+		
+		if (scrollPos >= top && scrollPos < top + height) {
+			navLinks.forEach(link => {
+				link.classList.remove('active-nav');
+				if (link.getAttribute('href') === `#${id}`) {
+					link.classList.add('active-nav');
+				}
+			});
+		}
+	});
+};
+
+window.addEventListener('scroll', updateActiveNav, { passive: true });
+updateActiveNav();
+
+// Add CSS for active nav
+const style = document.createElement('style');
+style.textContent = `
+	.active-nav {
+		color: #dc143c !important;
+		position: relative;
+	}
+	.active-nav::after {
+		content: '';
+		position: absolute;
+		bottom: 10px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 80%;
+		height: 2px;
+		background: #dc143c;
+		animation: slideInLeft 0.3s ease;
+	}
+`;
+document.head.appendChild(style);
